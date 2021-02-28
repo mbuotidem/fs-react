@@ -12,7 +12,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
-  const numbersToshow = filter ? persons.filter(x => x.name.includes(filter)) : persons
+  const numbersToshow = filter ? persons.filter(x => x.name.toLowerCase().includes(filter.toLowerCase())) : persons
 
   const addEntry = (event) => {
     event.preventDefault()
@@ -63,8 +63,6 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      {console.log(filter)}
-      {console.log(numbersToshow)}
       {numbersToshow.map((x) => <p key={x.name}>{x.name} {x.number}</p>)}
     </div>
   )
