@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+import Filter from './components/Filter'
+import PersonForm from './components/PersonForm'
+import Persons from './components/Persons'
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -12,12 +15,11 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
 
-  const numbersToshow = filter ? persons.filter(x => x.name.toLowerCase().includes(filter.toLowerCase())) : persons
+  const numbersToShow = filter ? persons.filter(x => x.name.toLowerCase().includes(filter.toLowerCase())) : persons
 
   const addEntry = (event) => {
     event.preventDefault()
     const newEntry = { name: newName, number: newNumber }
-    console.log(persons.indexOf(newEntry))
 
     if (persons.find(x => x.name === newName)) {
       alert(`${newName} is already added to phonebook`)
@@ -30,41 +32,35 @@ const App = () => {
 
 
   const handleFilter = (event) => {
-    console.log(event.target.value)
     setFilter(event.target.value)
   }
 
   const handleNameChange = (event) => {
-    //console.log(event.target.value)
     setNewName(event.target.value)
   }
 
 
   const handleNumberChange = (event) => {
-    //console.log(event.target.value)
     setNewNumber(event.target.value)
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addEntry}>
-        <div>
-          filter: <input value={filter} onChange={handleFilter} />
-        </div>
-        <div>
-          name: <input value={newName} onChange={handleNameChange} />
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+
+      <Filter filter={filter} handleFilter={handleFilter} />
+
+      <h3>Add a new Entry</h3>
+
+
+      <PersonForm addEntry={addEntry} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
+
+
       <h2>Numbers</h2>
-      {numbersToshow.map((x) => <p key={x.name}>{x.name} {x.number}</p>)}
+      {/* {numbersToShow.map((x) => <p key={x.name}>{x.name} {x.number}</p>)} */}
+      <Persons numbersToShow={numbersToShow} />
     </div>
+
   )
 }
 
