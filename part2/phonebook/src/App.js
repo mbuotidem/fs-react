@@ -3,6 +3,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import axios from 'axios'
+import personsService from './services/persons'
 
 
 const App = () => {
@@ -29,15 +30,64 @@ const App = () => {
     event.preventDefault()
     const newEntry = { name: newName, number: newNumber }
 
-    if (persons.find(x => x.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+    const entryExists = persons.find(x => x.name === newName)
+
+    if (entryExists) {
+      //alert(`${newName} is already added to phonebook`)
+
+      if (window.confirm(`${entryExists.name} is already added to phonebook, replace the old number with a new one?`)) {
+        const updatedEntry = { ...entryExists, number: newEntry.number }
+        personsService.update(entryExists.id, updatedEntry)
+          .then(returnedEntry => {
+            setPersons(persons.map(person => person.id !== entryExists.id ? person : returnedEntry))
+          })
+          .catch(error => {
+            alert(
+              'There was an issue updating your phonebook entry'
+            )
+            setPersons(persons.filter(p => p.id !== entryExists.id))
+          })
+
+      }
     }
     else {
       setPersons(persons.concat(newEntry))
+
+      personsService
+        .create(newEntry)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+        })
+
+      // axios.post(baseUrl, newEntry)
+      //   .then(response =>
+      //     console.log(response.data)
+
+      //   )
+
     }
+    setNewName('')
+    setNewNumber('')
 
   };
 
+  const deletePerson = (id) => {
+    console.log(id)
+    const entry = persons.find(p => p.id === id)
+
+    if (window.confirm(`Delete ${entry.name}?`)) {
+      personsService
+        .deleteEntry(id)
+        .then(result => {
+          console.log(result)
+          setPersons(persons.filter(p => p.id !== id))
+        })
+
+    }
+
+
+
+  }
 
   const handleFilter = (event) => {
     setFilter(event.target.value)
@@ -66,7 +116,7 @@ const App = () => {
 
       <h2>Numbers</h2>
       {/* {numbersToShow.map((x) => <p key={x.name}>{x.name} {x.number}</p>)} */}
-      <Persons numbersToShow={numbersToShow} />
+      <Persons numbersToShow={numbersToShow} deletePerson={deletePerson} />
     </div>
 
   )
