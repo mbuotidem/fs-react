@@ -13,8 +13,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
-  const [successMessage, setSuccessMessage] = useState(null)
-  const [notificationClass, setNotificationClass] = useState('success')
+  const [notification, setNotification] = useState(null)
+
 
 
   const hook = () => {
@@ -53,10 +53,10 @@ const App = () => {
         personsService.update(entryExists.id, updatedEntry)
           .then(returnedPerson => {
             setPersons(persons.map(person => person.id !== entryExists.id ? person : returnedPerson))
-            createSuccessMessage(returnedPerson.name, "success", "update")
+            createNotification(`Updated ${returnedPerson.name}`, "success")
           })
           .catch(error => {
-            createSuccessMessage(false, "error", "update")
+            createNotification(`There was an error updating ${updatedEntry.name}`, "error")
             setPersons(persons.filter(p => p.id !== entryExists.id))
           })
 
@@ -67,11 +67,11 @@ const App = () => {
         .create(newEntry)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
-          createSuccessMessage(returnedPerson.name, "success")
+          createNotification(`Updated ${returnedPerson.name}`, "success")
 
         })
         .catch(error => {
-          createSuccessMessage(false, "error", "create")
+          createNotification('There was an error creating the record', "error")
         })
     }
     setNewName('')
@@ -86,57 +86,27 @@ const App = () => {
         .deleteEntry(id)
         .then(result => {
           setPersons(persons.filter(p => p.id !== id))
-          createSuccessMessage(entry.name, "deleted")
+          createNotification(`${entry.name} deleted`, "success")
         })
         .catch(error => {
-          createSuccessMessage(entry.name, "error", "delete")
+          createNotification(`There was an error deleting ${entry.name}`, "error")
         })
     }
   }
 
-  const createSuccessMessage = (person, status, command) => {
-    if (status === "success") {
-      setNotificationClass("success")
-
-      if (command === "update") {
-        setSuccessMessage(`Updated ${person}`)
-      }
-      else {
-        setSuccessMessage(`Added ${person}`)
-      }
-    }
-    else if (status === "error") {
-      setNotificationClass("error")
-
-      if (command === "update") {
-        setSuccessMessage('There was an issue updating your phonebook entry')
-      }
-      if (command === "delete") {
-        setSuccessMessage(`Information of ${person} has already been removed fom server"`)
-      }
-      if (command === "create") {
-        setSuccessMessage("There was an issue creating your phonebook entry")
-
-      }
-
-    }
-    else if (status === "deleted") {
-      setNotificationClass("success")
-      setSuccessMessage(`${person} was removed from server`)
-    }
-
+  const createNotification = (message, type = 'success') => {
+    setNotification({ message, type })
     setTimeout(() => {
-      setSuccessMessage(null)
+      setNotification(null)
     }, 5000)
 
   }
-
 
   return (
     <div>
       <h2>Phonebook</h2>
 
-      <Notification message={successMessage} notificationClass={notificationClass} />
+      <Notification notification={notification} />
 
       <Filter filter={filter} handleFilter={handleFilter} />
 
