@@ -15,15 +15,6 @@ const App = () => {
   const [filter, setFilter] = useState('')
   const [notification, setNotification] = useState(null)
 
-
-  // const hook = () => {
-  //   axios
-  //     .get('http://localhost:3001/persons')
-  //     .then(response => {
-  //       setPersons(response.data)
-  //     })
-  // }
-
   const hook = () => {
     personsService.getAll().then(
       response => {
@@ -62,8 +53,8 @@ const App = () => {
             createNotification(`Updated ${returnedPerson.name}`, "success")
           })
           .catch(error => {
-            createNotification(`There was an error updating ${updatedEntry.name}`, "error")
-            setPersons(persons.filter(p => p.id !== entryExists.id))
+            createNotification(`${error.response.data.error}`, "error")
+            //setPersons(persons.filter(p => p.id !== entryExists.id))
           })
 
       }
@@ -78,7 +69,7 @@ const App = () => {
 
         })
         .catch(error => {
-          createNotification('There was an error creating the record', "error")
+          createNotification(`${error.response.data.error}`, "error")
         })
     }
     setNewName('')
